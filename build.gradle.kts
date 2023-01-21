@@ -2,12 +2,12 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
     `maven-publish`
+    kotlin("jvm") version "1.6.21"
     `kotlin-dsl`
-    kotlin("jvm") version "1.4.31"
 }
 
 group = "com.github.penn5"
-version = "0.1.3"
+version = "0.1.5"
 
 gradlePlugin {
     plugins {
@@ -30,8 +30,8 @@ repositories {
 }
 dependencies {
     compileOnly(gradleApi())
-    implementation("com.android.tools.build:gradle:4.2.1")
-    implementation("org.redundent:kotlin-xml-builder:1.7.2")
+    implementation("com.android.tools.build:gradle:7.4.0")
+    implementation("org.redundent:kotlin-xml-builder:1.8.0")
 }
 val compileKotlin: KotlinCompile by tasks
 compileKotlin.kotlinOptions {

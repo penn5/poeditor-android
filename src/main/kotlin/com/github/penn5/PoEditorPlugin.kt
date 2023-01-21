@@ -13,6 +13,8 @@ import org.redundent.kotlin.xml.PrintOptions
 import org.redundent.kotlin.xml.xml
 import java.io.File
 import java.io.IOException
+import java.nio.file.Path
+import java.nio.file.Paths
 import java.util.*
 
 val Project.android: BaseExtension? get() = findProperty("android") as BaseExtension?
@@ -162,7 +164,7 @@ open class ImportPoEditorStringsTask : ImportPoEditorStringsBaseTask<File>, Defa
                     .replace("'", "\\'").replace("\"", "\\\"").replace("\n", "\\n")
 }
 
-open class ImportPoEditorStringsForFastlaneTask : ImportPoEditorStringsBaseTask<File>, DefaultTask() {
+open class ImportPoEditorStringsForFastlaneTask : ImportPoEditorStringsBaseTask<Path>, DefaultTask() {
     @Internal
     override val platform = "fastlane-android"
     @Internal
@@ -173,14 +175,15 @@ open class ImportPoEditorStringsForFastlaneTask : ImportPoEditorStringsBaseTask<
     @TaskAction
     fun doAction() = super.doBaseAction()
 
-    override fun init(): File {
+    override fun init(): Path {
         val resDir = project.rootProject.rootDir.resolve("fastlane/metadata")
-        resDir.deleteRecursively()
-        return resDir
+        resDir.listFiles()!!
+            .flatMap { it.listFiles { file: File -> file.isFile && file.extension == "txt" }!!.asList() }
+            .forEach { it.delete() }
+        return resDir.toPath()
     }
 
-    override fun write(language: String, terms: List<PoEditorTerm>, project: PoEditorProject, data: File) {
-        val created = mutableSetOf<Pair<String, String>>()
+    override fun write(language: String, terms: List<PoEditorTerm>, project: PoEditorProject, data: Path) {
         for (term in terms) {
             term.translation?.content ?: continue
             if (!term.tags.contains("fastlane-android"))
@@ -189,10 +192,11 @@ open class ImportPoEditorStringsForFastlaneTask : ImportPoEditorStringsBaseTask<
             types.forEach {
                 val languageTag = expandLanguageTag(language)
                 val langDir = data.resolve(it).resolve(languageTag)
-                if (created.add(it to languageTag)) {
-                    check(langDir.mkdirs()) { "Couldn't create $langDir" }
-                }
-                val out = langDir.resolve(term.key + ".txt")
+                val relative = Paths.get(term.key + ".txt")
+                require(!relative.isAbsolute)
+                require(relative.none { path -> path.toString() == ".." })
+                val out = langDir.resolve(relative).toFile()
+                out.parentFile.mkdirs()
                 out.writeText(term.translation.content)
             }
         }
