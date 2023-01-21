@@ -178,8 +178,8 @@ open class ImportPoEditorStringsForFastlaneTask : ImportPoEditorStringsBaseTask<
     override fun init(): Path {
         val resDir = project.rootProject.rootDir.resolve("fastlane/metadata")
         resDir.listFiles()!!
-            .flatMap { it.listFiles { file: File -> file.isFile && file.extension == "txt" }!!.asList() }
-            .forEach { it.delete() }
+            .flatMap { it.listFiles { file: File -> file.isFile && file.extension == "txt" || file.name == "changelogs" }!!.asList() }
+            .forEach { it.deleteRecursively() }
         return resDir.toPath()
     }
 
