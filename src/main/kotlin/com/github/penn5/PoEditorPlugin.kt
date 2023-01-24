@@ -206,8 +206,8 @@ open class ImportPoEditorStringsForFastlaneTask : ImportPoEditorStringsBaseTask<
     private fun expandLanguageTag(language: String): String {
         return when (language) {
             // special case: Google (incorrectly) takes zh-CN for simplified Chinese and zh-TN for traditional (should use the BCP47 script data)
-            "zh-Hans" -> "zh-cn"
-            "zn-Hant" -> "zh-tn"
+            "zh-Hans" -> "zh-CN"
+            "zn-Hant" -> "zh-TN"
             else -> {
                 // reduce precision
                 Locale.lookupTag(listOf(Locale.LanguageRange(language)), AVAILABLE_TAGS)?.let {
