@@ -4,6 +4,8 @@ import com.android.build.gradle.BaseExtension
 import org.gradle.api.DefaultTask
 import org.gradle.api.Plugin
 import org.gradle.api.Project
+import org.gradle.api.Task
+import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.Internal
 import org.gradle.api.tasks.TaskAction
 import org.gradle.kotlin.dsl.create
@@ -38,7 +40,7 @@ open class PoEditorPluginExtension {
     var projectId: Int? = null
 }
 
-interface ImportPoEditorStringsBaseTask<T> {
+interface ImportPoEditorStringsBaseTask<T> : Task {
     fun doBaseAction() {
         try {
             // Don't throw an error, probably some other person is building who doesn't have poeditor set up
@@ -69,6 +71,9 @@ interface ImportPoEditorStringsBaseTask<T> {
                 }
                 val filteredTerms = terms.map {
                     var active = default
+                    if (!allowFuzzy && it.translation?.fuzzy == true) {
+                        active = false
+                    }
                     for (tag in it.tags) {
                         if (tag == "ignore-string-$platform" || (!tag.endsWith("-keep-$platform") && tag.substringBeforeLast("-keep-") in incompleteSets)) {
                             active = false
@@ -94,6 +99,8 @@ interface ImportPoEditorStringsBaseTask<T> {
     val thisProject: Project
     fun init(): T
     fun write(language: String, terms: List<PoEditorTerm>, project: PoEditorProject, data: T)
+
+    var allowFuzzy: Boolean
 }
 
 open class ImportPoEditorStringsTask : ImportPoEditorStringsBaseTask<File>, DefaultTask() {
@@ -103,6 +110,8 @@ open class ImportPoEditorStringsTask : ImportPoEditorStringsBaseTask<File>, Defa
     override val default = true
     @Internal
     override val thisProject = project
+    @Input
+    override var allowFuzzy = true
 
     @TaskAction
     fun doAction() = super.doBaseAction()
@@ -171,6 +180,8 @@ open class ImportPoEditorStringsForFastlaneTask : ImportPoEditorStringsBaseTask<
     override val default = false
     @Internal
     override val thisProject = project
+    @Input
+    override var allowFuzzy = true
 
     @TaskAction
     fun doAction() = super.doBaseAction()
