@@ -61,7 +61,7 @@ interface ImportPoEditorStringsBaseTask<T> : Task {
                 val terms = poProject.getTerms(language)
                 val incompleteSets = mutableSetOf<String>()
                 for (term in terms) {
-                    if (term.translation?.content != null)
+                    if (term.translation?.content != null || term.translation?.fuzzy == false || (term.translation?.fuzzy == true && allowFuzzy))
                         continue
                     for (tag in term.tags) {
                         if (!tag.startsWith("require-all-"))
