@@ -61,8 +61,9 @@ interface ImportPoEditorStringsBaseTask<T> : Task {
                 val terms = poProject.getTerms(language)
                 val incompleteSets = mutableSetOf<String>()
                 for (term in terms) {
-                    if (term.translation?.content != null || term.translation?.fuzzy == false || (term.translation?.fuzzy == true && allowFuzzy))
+                    if (term.translation?.content != null && (!term.translation.fuzzy || (term.translation.fuzzy && allowFuzzy))) {
                         continue
+                    }
                     for (tag in term.tags) {
                         if (!tag.startsWith("require-all-"))
                             continue
@@ -82,10 +83,11 @@ interface ImportPoEditorStringsBaseTask<T> : Task {
                             active = true
                         }
                     }
-                    if (active)
+                    if (active) {
                         it
-                    else
+                    } else {
                         it.copy(translation = null)
+                    }
                 }
                 write(language, filteredTerms, poProject, tmp)
             }
@@ -104,6 +106,10 @@ interface ImportPoEditorStringsBaseTask<T> : Task {
 }
 
 open class ImportPoEditorStringsTask : ImportPoEditorStringsBaseTask<File>, DefaultTask() {
+    init {
+        outputs.upToDateWhen { false }
+    }
+
     @Internal
     override val platform = "android"
     @Internal
@@ -174,6 +180,10 @@ open class ImportPoEditorStringsTask : ImportPoEditorStringsBaseTask<File>, Defa
 }
 
 open class ImportPoEditorStringsForFastlaneTask : ImportPoEditorStringsBaseTask<Path>, DefaultTask() {
+    init {
+        outputs.upToDateWhen { false }
+    }
+
     @Internal
     override val platform = "fastlane-android"
     @Internal
