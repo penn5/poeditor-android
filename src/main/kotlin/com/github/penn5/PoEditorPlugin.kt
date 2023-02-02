@@ -72,9 +72,6 @@ interface ImportPoEditorStringsBaseTask<T> : Task {
                 }
                 val filteredTerms = terms.map {
                     var active = default
-                    if (!allowFuzzy && it.translation?.fuzzy == true) {
-                        active = false
-                    }
                     for (tag in it.tags) {
                         if (tag == "ignore-string-$platform" || (!tag.endsWith("-keep-$platform") && tag.substringBeforeLast("-keep-") in incompleteSets)) {
                             active = false
@@ -82,6 +79,9 @@ interface ImportPoEditorStringsBaseTask<T> : Task {
                         } else if (tag == platform) {
                             active = true
                         }
+                    }
+                    if (!allowFuzzy && it.translation?.fuzzy == true) {
+                        active = false
                     }
                     if (active) {
                         it
@@ -197,6 +197,7 @@ open class ImportPoEditorStringsForFastlaneTask : ImportPoEditorStringsBaseTask<
     fun doAction() = super.doBaseAction()
 
     override fun init(): Path {
+        println(allowFuzzy)
         val resDir = project.rootProject.rootDir.resolve("fastlane/metadata")
         resDir.listFiles()!!
             .flatMap { it.listFiles { file: File -> !file.isHidden && file.isDirectory }!!.asList() }
