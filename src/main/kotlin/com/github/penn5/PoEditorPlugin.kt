@@ -197,7 +197,6 @@ open class ImportPoEditorStringsForFastlaneTask : ImportPoEditorStringsBaseTask<
     fun doAction() = super.doBaseAction()
 
     override fun init(): Path {
-        println(allowFuzzy)
         val resDir = project.rootProject.rootDir.resolve("fastlane/metadata")
         resDir.listFiles()!!
             .flatMap { it.listFiles { file: File -> !file.isHidden && file.isDirectory }!!.asList() }
