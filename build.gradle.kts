@@ -7,7 +7,7 @@ plugins {
 }
 
 group = "com.github.penn5"
-version = "0.2.0"
+version = "0.2.1"
 
 gradlePlugin {
     plugins {
@@ -30,14 +30,18 @@ repositories {
 }
 dependencies {
     compileOnly(gradleApi())
-    implementation("com.android.tools.build:gradle:7.4.0")
-    implementation("org.redundent:kotlin-xml-builder:1.8.0")
+    implementation("com.android.tools.build:gradle:7.4.2")
+    implementation("org.redundent:kotlin-xml-builder:1.9.0")
+}
+
+java {
+    targetCompatibility = JavaVersion.VERSION_11
 }
 val compileKotlin: KotlinCompile by tasks
 compileKotlin.kotlinOptions {
-    jvmTarget = "1.8"
+    jvmTarget = "11"
 }
 val compileTestKotlin: KotlinCompile by tasks
 compileTestKotlin.kotlinOptions {
-    jvmTarget = "1.8"
+    jvmTarget = "11"
 }
