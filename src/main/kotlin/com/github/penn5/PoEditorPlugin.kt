@@ -158,7 +158,13 @@ open class ImportPoEditorStringsTask : ImportPoEditorStringsBaseTask<File>, Defa
             "zn-Hant" -> return "values-zh-rtw"
         }
         val locale = Locale.forLanguageTag(tag)
-        var ret =  "values-${locale.language}"
+        val language = when (locale.language) {
+            "he" -> "iw"
+            "id" -> "in"
+            "yi" -> "ji"
+            else -> locale.language
+        }
+        var ret =  "values-${language}"
         if (locale.country != "")
             ret += "-r${locale.country}"
         return ret
